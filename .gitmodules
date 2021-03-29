@@ -1,0 +1,6 @@
+[submodule "external/FreeRTOS-LTS"]
+	path = external/FreeRTOS-LTS
+	url = https://github.com/FreeRTOS/FreeRTOS-LTS.git
+[submodule "external/littlefs"]
+	path = external/littlefs
+	url = https://github.com/littlefs-project/littlefs.git

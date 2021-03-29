@@ -1,0 +1,124 @@
+# https://clang.llvm.org/docs/ClangFormatStyleOptions.html
+---
+BasedOnStyle: None
+Language: Cpp
+AccessModifierOffset: -2
+AlignAfterOpenBracket: Align
+AlignConsecutiveAssignments: true
+# AlignConsecutiveBitFields: true
+AlignConsecutiveDeclarations: true
+AlignConsecutiveMacros: true
+AlignEscapedNewlines: Left
+AlignOperands: true
+AlignTrailingComments: true
+AllowAllArgumentsOnNextLine: true
+AllowAllConstructorInitializersOnNextLine: false
+AllowAllParametersOfDeclarationOnNextLine: false
+AllowShortBlocksOnASingleLine: Empty
+AllowShortCaseLabelsOnASingleLine: false
+# AllowShortEnumsOnASingleLine: false
+AllowShortFunctionsOnASingleLine: Inline
+AllowShortIfStatementsOnASingleLine: WithoutElse
+AllowShortLambdasOnASingleLine: Inline
+AllowShortLoopsOnASingleLine: false
+AlwaysBreakAfterReturnType: None
+AlwaysBreakBeforeMultilineStrings: false
+AlwaysBreakTemplateDeclarations: Yes
+# AttributeMacros: ['__capability', '__output', '__ununsed']
+BinPackArguments: true
+BinPackParameters: false
+# BitFieldColonSpacing: Both
+BraceWrapping:
+  AfterCaseLabel:           false
+  AfterClass:               false
+  AfterControlStatement:    Always
+  AfterEnum:                false
+  AfterFunction:            true
+  AfterNamespace:           false
+  AfterStruct:              false
+  AfterUnion:               false
+  AfterExternBlock:         false
+  BeforeCatch:              true
+  BeforeElse:               true
+  # BeforeLambdaBody:         false
+  # BeforeWhile:              false
+  IndentBraces:             false
+  SplitEmptyFunction:       false
+  SplitEmptyRecord:         false
+  SplitEmptyNamespace:      false
+BreakBeforeBinaryOperators: None
+BreakBeforeBraces: Custom
+BreakBeforeTernaryOperators: true
+BreakConstructorInitializers: BeforeComma
+BreakInheritanceList: BeforeComma
+BreakStringLiterals: true
+ColumnLimit: 120
+CommentPragmas: '(NOLINT|.*cppcheck-suppress.*|INDENT-OFF|INDENT-ON)'
+CompactNamespaces: false
+ConstructorInitializerAllOnOneLineOrOnePerLine: false
+ConstructorInitializerIndentWidth: 2
+ContinuationIndentWidth: 2
+Cpp11BracedListStyle: false
+DeriveLineEnding: true
+DerivePointerAlignment: false
+DisableFormat: false
+FixNamespaceComments: true
+ForEachMacros: [ 'foreach', 'Q_FOREACH', 'BOOST_FOREACH', 'RANGES_FOR' ]
+IncludeBlocks: Regroup
+IncludeCategories: # Main file is priority 0, negatives are valid
+  # <boost/asio.hpp>, <gtest/gtest.h>
+  - Regex:  '^<.*\/.*'
+    Priority: -20
+  # <string>, <cstdlib>, <stdint.h>
+  - Regex:  '^<.*'
+    Priority: -30
+  # "MyClass.hpp"
+  - Regex:  '^".*'
+    Priority: -10
+# IncludeIsMainRegex: '(.*Test.*|.*Mock.*|.*test.*|.*mock.*)?$'
+# IntentCaseBlocks: false
+IndentCaseLabels: true
+# IndentExternBlock: NoIndent
+IndentGotoLabels: false
+IndentPPDirectives: BeforeHash
+IndentWidth: 2
+IndentWrappedFunctionNames: false
+# InsertTrailingCommas: true
+KeepEmptyLinesAtTheStartOfBlocks: false
+MacroBlockBegin: '.*_BEGIN'
+MacroBlockEnd: '.*_END'
+MaxEmptyLinesToKeep: 1
+NamespaceIndentation: None
+NamespaceMacros: [ 'NOMANGLE' ]
+PointerAlignment: Left
+ReflowComments: true
+SortIncludes: true
+SortUsingDeclarations: true
+SpaceAfterCStyleCast: false
+SpaceAfterLogicalNot: false
+SpaceAfterTemplateKeyword: true
+SpaceBeforeAssignmentOperators: true
+SpaceBeforeCpp11BracedList: false
+SpaceBeforeCtorInitializerColon: true
+SpaceBeforeInheritanceColon: true
+SpaceBeforeParens: ControlStatements
+SpaceBeforeRangeBasedForLoopColon: true
+SpaceBeforeSquareBrackets: false
+SpaceInEmptyBlock: false
+SpaceInEmptyParentheses: false
+SpacesBeforeTrailingComments: 2
+SpacesInAngles: false
+SpacesInCStyleCastParentheses: false
+SpacesInConditionalStatement: false
+SpacesInContainerLiterals: true
+SpacesInParentheses: false
+SpacesInSquareBrackets: false
+Standard: Latest
+StatementMacros: [ 'Q_UNUSED' ]
+TabWidth: 3
+TypenameMacros: [ 'STACK_OF', 'LIST_ENTRY' ]
+UseCRLF: false
+UseTab: Never
+# WhitespaceSensitiveMacros: [ 'STRINGIZE', 'PP_STRINGIZE', 'BOOST_PP_STRINGIZE', 'STRINGIFY', 'XSTRINGIFY' ]
+...
+
