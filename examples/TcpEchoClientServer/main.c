@@ -1,3 +1,5 @@
+#include <pcap/pcap.h>
+
 // std
 #include <stdbool.h>
 #include <stddef.h>
@@ -21,7 +23,7 @@
  * to and from a real network connection on the host PC.  See the
  * configNETWORK_INTERFACE_TO_USE definition for information on how to configure
  * the real network connection to use. */
-uint8_t ucMACAddress[6] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
+uint8_t ucMACAddress[6] = { 0x00, 0x11, 0x22, 0x33, 0x44, 0x55 };
 
 typedef struct Task {
   TaskHandle_t Handle;
@@ -31,7 +33,7 @@ typedef struct Task {
 
 static Task             NetTask;
 static Task             ServerTask;
-static const TickType_t DEFAULT_TIMEOUT = pdMS_TO_MIN_TICKS(2000);
+static const TickType_t DEFAULT_TIMEOUT = pdMS_TO_MIN_TICKS(6000);
 
 bool CheckSocketResult(BaseType_t result, const char* name)
 {
@@ -50,22 +52,38 @@ void NetTask_Run(void* parameters)
   (void)parameters;
   BaseType_t               socket_result  = 0;
   struct freertos_sockaddr remote_address = {
-    .sin_port = FreeRTOS_htons((uint16_t)10000),
-    .sin_addr = FreeRTOS_inet_addr_quick(127, 0, 0, 1),
+    .sin_len    = sizeof(struct freertos_sockaddr),
+    .sin_family = FREERTOS_AF_INET,
+    .sin_port   = FreeRTOS_htons((uint16_t)15000),
+    //.sin_addr   = FreeRTOS_inet_addr_quick(127, 0, 0, 1),
+    .sin_addr   = FreeRTOS_inet_addr_quick(192, 168, 1, 100),
   };
 
-  Socket_t socket = FreeRTOS_socket(FREERTOS_AF_INET, FREERTOS_SOCK_STREAM, FREERTOS_IPPROTO_TCP);
-  configASSERT(socket != FREERTOS_INVALID_SOCKET);
-  socket_result = FreeRTOS_setsockopt(socket, 0, FREERTOS_SO_RCVTIMEO, &DEFAULT_TIMEOUT, sizeof(DEFAULT_TIMEOUT));
-  CheckSocketResult(socket_result, "[Client] sockopt RCVTIMEO");
-  socket_result = FreeRTOS_setsockopt(socket, 0, FREERTOS_SO_SNDTIMEO, &DEFAULT_TIMEOUT, sizeof(DEFAULT_TIMEOUT));
-  CheckSocketResult(socket_result, "[Client] sockopt SNDTIMEO");
+  vTaskDelay(pdMS_TO_TICKS(1000));
+  Socket_t socket;
 
   static const char tx[] = "Hello From Client!";
 
   do
   {
+    socket = FreeRTOS_socket(FREERTOS_AF_INET, FREERTOS_SOCK_STREAM, FREERTOS_IPPROTO_TCP);
+    configASSERT(socket != FREERTOS_INVALID_SOCKET);
+    socket_result = FreeRTOS_setsockopt(socket, 0, FREERTOS_SO_RCVTIMEO, &DEFAULT_TIMEOUT, sizeof(DEFAULT_TIMEOUT));
+    CheckSocketResult(socket_result, "[Client] sockopt RCVTIMEO");
+    socket_result = FreeRTOS_setsockopt(socket, 0, FREERTOS_SO_SNDTIMEO, &DEFAULT_TIMEOUT, sizeof(DEFAULT_TIMEOUT));
+    CheckSocketResult(socket_result, "[Client] sockopt SNDTIMEO");
     socket_result = FreeRTOS_connect(socket, &remote_address, sizeof(remote_address));
+    if (socket_result != 0)
+    {
+      if (FreeRTOS_closesocket(socket) == 1)
+      {
+        printf("[Clinet] socketclose succeeded\n");
+      }
+      else
+      {
+        printf("[Clinet] socketclose failed\n");
+      }
+    }
   } while (!CheckSocketResult(socket_result, "[Client] connect"));
 
   while (true)
@@ -95,8 +113,13 @@ void ServerTask_Run(void* parameters)
   (void)parameters;
   static const TickType_t  WAIT_FOREVER    = portMAX_DELAY;
   static const BaseType_t  MAX_CONNECTIONS = 5;
+  //vTaskDelay(pdMS_TO_TICKS(1000));
   struct freertos_sockaddr bind_address    = {
-    .sin_port = FreeRTOS_htons((uint16_t)10000),
+    //.sin_len    = sizeof(struct freertos_sockaddr),
+    //.sin_family = FREERTOS_AF_INET,
+    .sin_port   = FreeRTOS_htons((uint16_t)15000),
+    //.sin_addr   = FreeRTOS_inet_addr_quick(127, 0, 0, 1),
+    //.sin_addr   = FreeRTOS_inet_addr_quick(192, 168, 1, 100),
   };
   BaseType_t socket_result = 0;
 
@@ -113,6 +136,7 @@ void ServerTask_Run(void* parameters)
   socklen_t                client_size      = sizeof(client);
   Socket_t                 connected_socket = FreeRTOS_accept(listen_socket, &client, &client_size);
   configASSERT(connected_socket != FREERTOS_INVALID_SOCKET);
+  printf("[Server] accept succeeded\n");
 
   static char rx[32];
   memset(rx, 0, sizeof(rx));
@@ -141,18 +165,57 @@ void CreateTasks()
                       STRINGIFY(NetTask_Run), 1, NetTask.Stack, &NetTask.ControlBlock);
 }
 
-int main()
+void netmain()
 {
   //  static const uint8_t ucIPAddress[4]      = { 10, 10, 10, 200 };
-  static const uint8_t ucIPAddress[4] = { 127, 0, 0, 1 };
-  static const uint8_t ucNetMask[4]   = { 255, 0, 0, 0 };
-  //  static const uint8_t ucGatewayAddress[4] = { 10, 10, 10, 1 };
-  static const uint8_t ucGatewayAddress[4] = { 127, 0, 0, 1 };
+  // static const uint8_t ucIPAddress[4] = { 127, 0, 0, 1 };
+  // 192 168 1 10
+  static const uint8_t ucIPAddress[4] = { 192, 168, 1, 100 };
+  static const uint8_t ucNetMask[4]   = { 255, 255, 255, 0 };
+  static const uint8_t ucGatewayAddress[4] = { 192, 168, 1, 1 };
   /* The following is the address of an OpenDNS server. */
   static const uint8_t ucDNSServerAddress[4] = { 208, 67, 222, 222 };
   FreeRTOS_IPInit(ucIPAddress, ucNetMask, ucGatewayAddress, ucDNSServerAddress, ucMACAddress);
   CreateTasks();
   vTaskStartScheduler();
+}
 
+void netifmain() {
+  pcap_if_t *alldevs;
+  pcap_if_t *d;
+  int i=0;
+  char errbuf[PCAP_ERRBUF_SIZE];
+  
+  /* Retrieve the device list from the local machine */
+  if (pcap_findalldevs(&alldevs, NULL /* auth is not needed */, &alldevs, errbuf) == -1)
+  {
+      fprintf(stderr,"Error in pcap_findalldevs_ex: %s\n", errbuf);
+      exit(1);
+  }
+  
+  /* Print the list */
+  for(d= alldevs; d != NULL; d= d->next)
+  {
+      printf("%d. %s", ++i, d->name);
+      if (d->description)
+          printf(" (%s)\n", d->description);
+      else
+          printf(" (No description available)\n");
+  }
+  
+  if (i == 0)
+  {
+      printf("\nNo interfaces found! Make sure WinPcap is installed.\n");
+      return;
+  }
+
+  /* We don't need any more the device list. Free it */
+  pcap_freealldevs(alldevs);
+  return 0;
+}
+
+int main()
+{
+  netmain();
   return 0;
 }

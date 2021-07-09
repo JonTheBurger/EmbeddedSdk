@@ -12,32 +12,34 @@ target_link_libraries(HelloTasks
     FreeRTOS::Kernel
 )
 
-if (UNIX)
-  add_executable(TcpEchoClientServer TcpEchoClientServer/main.c)
-  target_link_libraries(TcpEchoClientServer
-    PRIVATE
-      FreeRTOS::Kernel
-  )
+add_executable(TcpEchoClientServer TcpEchoClientServer/main.c)
+target_link_libraries(TcpEchoClientServer
+  PRIVATE
+    FreeRTOS::Kernel
+)
 
-  find_package(PkgConfig)
-  pkg_check_modules(PCAP REQUIRED IMPORTED_TARGET libpcap)
-  set(tcpdir ${PROJECT_SOURCE_DIR}/external/FreeRTOS-LTS/FreeRTOS/FreeRTOS-Plus-TCP)
-  file(GLOB tcpFiles LIST_DIRECTORIES false "${tcpdir}/*.c")
-  target_sources(TcpEchoClientServer
-    PRIVATE
-      ${tcpFiles}
-      ${tcpdir}/portable/BufferManagement/BufferAllocation_1.c
-      ${tcpdir}/portable/NetworkInterface/linux/NetworkInterface.c
-      ${PROJECT_SOURCE_DIR}/tools/cmake/modules/FreeRTOSIPConfigDefaults.c
-  )
-  target_include_directories(TcpEchoClientServer
-    PRIVATE
-      ${CMAKE_CURRENT_LIST_DIR}
-      ${tcpdir}/include
-      ${tcpdir}/portable/Compiler/GCC
-  )
-  target_link_libraries(TcpEchoClientServer
-    PRIVATE
-      PkgConfig::PCAP
-  )
-endif()
+list(APPEND CMAKE_PREFIX_PATH "C:/Tools/npcap-sdk")
+find_package(PCap REQUIRED)
+set(tcpdir ${PROJECT_SOURCE_DIR}/external/FreeRTOS-LTS/FreeRTOS/FreeRTOS-Plus-TCP)
+file(GLOB tcpFiles LIST_DIRECTORIES false "${tcpdir}/*.c")
+target_sources(TcpEchoClientServer
+  PRIVATE
+    ${tcpFiles}
+    ${tcpdir}/portable/BufferManagement/BufferAllocation_2.c
+    ${PROJECT_SOURCE_DIR}/tools/cmake/modules/FreeRTOSIPConfigDefaults.c
+    #${tcpdir}/portable/NetworkInterface/linux/NetworkInterface.c
+    ${tcpdir}/portable/NetworkInterface/WinPCap/NetworkInterface.c
+    #${tcpdir}/portable/NetworkInterface/WinPCap/FaultInjection.c
+)
+target_include_directories(TcpEchoClientServer
+  PRIVATE
+    ${CMAKE_CURRENT_LIST_DIR}
+    ${tcpdir}/include
+    #${tcpdir}/portable/Compiler/GCC
+    ${tcpdir}/portable/Compiler/MSVC
+)
+target_link_libraries(TcpEchoClientServer
+  PRIVATE
+    PCap::PCap
+)
+

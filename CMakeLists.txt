@@ -8,6 +8,7 @@ else()
   set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/tools/cmake/modules PARENT_SCOPE)
 endif()
 set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/tools/cmake/modules)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 option(EMBEDDEDSDK_BUILD_EXAMPLES "Build PC examples for Embedded SDK" ${IS_TOP_LEVEL})
 

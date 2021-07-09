@@ -52,11 +52,10 @@ static inline BaseType_t ApplicationGetRandomNumber(uint32_t* number)
 #define xApplicationGetRandomNumber(expr)      ApplicationGetRandomNumber(expr)
 #define mainHOST_NAME                          "RTOSDemo"
 #define mainDEVICE_NICK_NAME                   "linux_demo"
-#define ipconfigNUM_NETWORK_BUFFER_DESCRIPTORS (2)
 
 // LOOPBACK
 // sudo tcpdump -D | grep lo
-#define configNETWORK_INTERFACE_TO_USE 2
+#define configNETWORK_INTERFACE_TO_USE 4
 
 // ifconfig lo
 #define configNET_MASK3 (255)
@@ -69,7 +68,7 @@ static inline BaseType_t ApplicationGetRandomNumber(uint32_t* number)
 /* Set to 1 to print out debug messages.  If ipconfigHAS_DEBUG_PRINTF is set to
 1 then FreeRTOS_debug_printf should be defined to the function used to print
 out the debugging messages. */
-#define ipconfigHAS_DEBUG_PRINTF 0
+#define ipconfigHAS_DEBUG_PRINTF 1
 #if (ipconfigHAS_DEBUG_PRINTF == 1)
   #define FreeRTOS_debug_printf(X) printf X
 #endif
@@ -78,9 +77,10 @@ out the debugging messages. */
 FreeRTOS_netstat() command, and ping replies.  If ipconfigHAS_PRINTF is set to 1
 then FreeRTOS_printf should be set to the function used to print out the
 messages. */
-#define ipconfigHAS_PRINTF 0
+#define ipconfigHAS_PRINTF 1
 #if (ipconfigHAS_PRINTF == 1)
-  #define FreeRTOS_printf(X) vLoggingPrintf X
+  #define FreeRTOS_printf(X) printf X
+  //#define FreeRTOS_printf(X) vLoggingPrintf X
 #endif
 
 /* Define the byte order of the target MCU (the MCU FreeRTOS+TCP is executing
@@ -221,7 +221,7 @@ not set to 1 then only FreeRTOS_indet_addr_quick() is available. */
 are available to the IP stack.  The total number of network buffers is limited
 to ensure the total amount of RAM that can be consumed by the IP stack is capped
 to a pre-determinable value. */
-#define ipconfigNUM_NETWORK_BUFFER_DESCRIPTORS 60
+#define ipconfigNUM_NETWORK_BUFFER_DESCRIPTORS 10
 
 /* A FreeRTOS queue is used to send events from application tasks to the IP
 stack.  ipconfigEVENT_QUEUE_LENGTH sets the maximum number of events that can

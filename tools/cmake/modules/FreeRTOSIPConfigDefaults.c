@@ -1,7 +1,33 @@
+#include <stdbool.h>
 #include <stdint.h>
+#include <stdio.h>
 #include <FreeRTOS.h>
 #include <FreeRTOS_IP.h>
 #include <FreeRTOS_Sockets.h>
+
+static BaseType_t xCaseInsensitiveStringCompare(const char* lhs, const char* rhs)
+{
+  BaseType_t diff = 0;
+
+  if ((lhs != NULL) && (rhs != NULL))
+  {
+    while ((diff == 0) && (*lhs != '\0') && (*rhs != '\0'))
+    {
+      diff = toupper(*lhs++) - toupper(*rhs++);
+    }
+
+    if (diff == 0)
+    {
+      if ((*lhs == '\0') && (*rhs != '\0')) { diff = -*rhs; }
+      else if ((*lhs != '\0') && (*rhs == '\0'))
+      {
+        diff = *lhs;
+      }
+    }
+  }
+  
+  return diff;
+}
 
 const char* pcApplicationHostnameHook(void)
 {
@@ -18,8 +44,8 @@ BaseType_t xApplicationDNSQueryHook(const char* pcName)
   /* Determine if a name lookup is for this node.  Two names are given
    * to this node: that returned by pcApplicationHostnameHook() and that set
    * by mainDEVICE_NICK_NAME. */
-  if (strcasecmp(pcName, pcApplicationHostnameHook()) == 0) { xReturn = pdPASS; }
-  else if (strcasecmp(pcName, mainDEVICE_NICK_NAME) == 0)
+  if (xCaseInsensitiveStringCompare(pcName, pcApplicationHostnameHook()) == 0) { xReturn = pdPASS; }
+  else if (xCaseInsensitiveStringCompare(pcName, mainDEVICE_NICK_NAME) == 0)
   {
     xReturn = pdPASS;
   }
@@ -124,4 +150,13 @@ void vNetworkInterfaceAllocateRAMToBuffers(
     future versions. */
     *((uint32_t*)&ucBuffers[x][0]) = (uint32_t) & (pxNetworkBuffers[x]);
   }
+}
+
+// Pretend to always have 4MiB available
+size_t xPortGetMinimumEverFreeHeapSize(void) {
+  return 4194304;
+}
+
+size_t xPortGetFreeHeapSize(void) {
+  return 4194304;
 }

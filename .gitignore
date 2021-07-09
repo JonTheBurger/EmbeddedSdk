@@ -1,4 +1,5 @@
 *-prefix/
+.vs/
 build/
 CMakeCache.txt
 CMakeFiles
